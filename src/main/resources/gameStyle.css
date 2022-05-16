@@ -1,0 +1,16 @@
+.cell {
+    -fx-border-style: solid;
+}
+
+.selectable {
+    -fx-border-width: 5;
+}
+
+.selectable:hover {
+    -fx-border-width: 5;
+    -fx-background-color: silver;
+}
+
+.winningCell {
+    -fx-background-color: green;
+}
