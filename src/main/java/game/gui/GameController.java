@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -25,12 +27,16 @@ import javafx.stage.Stage;
 
 public class GameController {
 
-    public void handleResetButton(javafx.event.ActionEvent event) throws IOException {
-        Parent root = FXMLLoader.load(getClass().getResource("/game.fxml"));
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
-        stage.show();
+    private String bluePlayerName;
+
+    private String redPlayerName;
+
+    public void setBluePlayerName(String bluePlayerName) {
+        this.bluePlayerName = bluePlayerName;
+    }
+
+    public void setRedPlayerName(String redPlayerName) {
+        this.redPlayerName = redPlayerName;
     }
 
     private boolean selectionPhaseOne = true;
@@ -50,7 +56,25 @@ public class GameController {
     private Label label;
 
     @FXML
+    public void handleResetButton(ActionEvent event) throws IOException {
+        resetGame();
+    }
+
+    @FXML
     private void initialize() {
+        createBoard();
+        createCircles();
+        setSelectablePositions();
+        showSelectableCells();
+        Platform.runLater(this::setUpNextTurn);
+    }
+
+    private void resetGame(){
+        clearBoard();
+        hideSelectableCells();
+        isGameOver = false;
+        selectionPhaseOne = true;
+        model = new GameModel();
         createBoard();
         createCircles();
         setSelectablePositions();
@@ -71,6 +95,13 @@ public class GameController {
         cell.getStyleClass().add("cell");
         cell.setOnMouseClicked(this::handleMouseClick);
         return cell;
+    }
+
+    private void clearBoard(){
+        for (int i = 0; i < model.getCircleCount(); i++) {
+            getCell(model.getCirclePosition(i)).getChildren().clear();
+            getCell(model.getCirclePosition(i)).getStyleClass().remove("winningCell");
+        }
     }
 
     private void createCircles() {
@@ -118,7 +149,7 @@ public class GameController {
     private void handleNextTurn(){
         if (model.isWin(model.getCirclePositions())){
             hideSelectableCells();
-            model.setWinLabel(label);
+            setWinLabel();
             isGameOver = true;
             showWinningCells();
             //showGameOverUI();
@@ -149,10 +180,36 @@ public class GameController {
         showSelectableCells();
     }
 
+    public void increasePlayerTurn(){
+        model.increasePlayerTurn();
+    }
+
+    public void setUpNextTurn(){
+        if (model.getPlayerTurn() % 2 == 0) {
+            label.setText(bluePlayerName + " turns");
+            label.setStyle("-fx-background-color: black;" + "-fx-text-fill: blue");
+        }
+        else{
+            label.setText(redPlayerName + " turns");
+            label.setStyle("-fx-background-color: black;" + "-fx-text-fill: red");
+        }
+    }
+
+    public void setWinLabel(){
+        if (model.getPlayerTurn() % 2 == 0){
+            label.setText(bluePlayerName + " wins");
+        }
+        else{
+            label.setText(redPlayerName + " wins");
+        }
+        label.setStyle("-fx-background-color: black;" + "-fx-text-fill: green");
+    }
+
     private void setSelectablePositions() {
         selectablePositions.clear();
         if (selectionPhaseOne){
-            model.setTurnLabel(label);
+            increasePlayerTurn();
+            setUpNextTurn();
             selectablePositions.addAll(model.getCirclePositions());
         }
         else {

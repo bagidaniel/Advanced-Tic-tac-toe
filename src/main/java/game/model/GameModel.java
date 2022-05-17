@@ -1,9 +1,9 @@
 package game.model;
 
 import javafx.beans.property.ObjectProperty;
-import javafx.scene.control.Label;
 
 import java.util.*;
+
 
 public class GameModel {
 
@@ -16,6 +16,14 @@ public class GameModel {
 
     Random random = new Random();
     private int playerTurn = random.nextInt(2);
+
+    public void increasePlayerTurn(){
+        playerTurn++;
+    }
+
+    public int getPlayerTurn() {
+        return playerTurn;
+    }
 
     public GameModel() {
         this(new Circle(CircleType.BLUE, new Position(0, 0)),
@@ -101,32 +109,6 @@ public class GameModel {
         return CircleType.RED;
     }
 
-    private void increasePlayerTurn(){
-        playerTurn++;
-    }
-
-    public void setTurnLabel(Label label){
-        increasePlayerTurn();
-        if (playerTurn % 2 == 0) {
-            label.setText("Blue player turns");
-            label.setStyle("-fx-background-color: black;" + "-fx-text-fill: blue");
-        }
-        else{
-            label.setText("Red player turns");
-            label.setStyle("-fx-background-color: black;" + "-fx-text-fill: red");
-        }
-    }
-
-    public void setWinLabel(Label label){
-        if (playerTurn % 2 == 0){
-            label.setText("Blue player wins");
-        }
-        else{
-            label.setText("Red player wins");
-        }
-        label.setStyle("-fx-background-color: black;" + "-fx-text-fill: green");
-    }
-
     public List<Position> getCirclePositions() {
         List<Position> positions = new ArrayList<>(circles.length);
         for (var circle : circles) {
@@ -134,7 +116,6 @@ public class GameModel {
                 positions.add(circle.getPosition());
             }
         }
-        System.out.println(positions);
         return positions;
     }
 
