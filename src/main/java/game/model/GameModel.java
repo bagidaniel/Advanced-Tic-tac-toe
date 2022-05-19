@@ -97,12 +97,12 @@ public class GameModel {
         circles[circleID].moveTo(direction);
     }
 
-    private boolean isOnBoard(Position position) {
+    protected boolean isOnBoard(Position position) {
         return position.row() >= 0 && position.row() < MAX_ROW_SIZE &&
                 position.col() >= 0 && position.col() < MAX_COL_SIZE;
     }
 
-    public CircleType switchPlayer(){
+    public CircleType switchPlayer(int playerTurn){
         if (playerTurn % 2 == 0) {
             return CircleType.BLUE;
         }
@@ -112,7 +112,7 @@ public class GameModel {
     public List<Position> getCirclePositions() {
         List<Position> positions = new ArrayList<>(circles.length);
         for (var circle : circles) {
-            if (circle.getType().equals(switchPlayer())) {
+            if (circle.getType().equals(switchPlayer(playerTurn))) {
                 positions.add(circle.getPosition());
             }
         }
@@ -137,7 +137,7 @@ public class GameModel {
                 checkRowWin(positions.get(1), positions.get(2), positions.get(3));
     }
 
-    private boolean checkRowWin(Position position1, Position position2, Position position3){
+    protected boolean checkRowWin(Position position1, Position position2, Position position3){
         if (position1.row() == position2.row() && position1.row() == position3.row() &&
                 (position1.col() + position2.col() + position3.col()) % 3 == 0){
             addToWinningCells(position1, position2, position3);
@@ -153,7 +153,7 @@ public class GameModel {
                 checkColWin(positions.get(1), positions.get(2), positions.get(3));
     }
 
-    private boolean checkColWin(Position position1, Position position2, Position position3){
+    protected boolean checkColWin(Position position1, Position position2, Position position3){
         if (position1.col() == position2.col() && position1.col() == position3.col() &&
                 (position1.row() + position2.row() + position3.row()) % 3 == 0){
             addToWinningCells(position1, position2, position3);
@@ -162,7 +162,8 @@ public class GameModel {
         return false;
     }
 
-    private boolean diagWins(List<Position> positions){
+    protected boolean diagWins(List<Position> positions){
+        System.out.println(positions);
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
                 if (positions.get(i).row()-1 == positions.get(j).row() && positions.get(i).col()-1 == positions.get(j).col()) {
