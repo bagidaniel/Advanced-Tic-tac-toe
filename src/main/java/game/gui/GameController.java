@@ -1,9 +1,15 @@
 package game.gui;
 
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import game.model.Data;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -152,6 +158,11 @@ public class GameController {
             setWinLabel();
             isGameOver = true;
             showWinningCells();
+            try {
+                exportData();
+            }catch (Exception e){
+                System.out.println("Hiba");
+            }
             //showGameOverUI();
         }
         else {
@@ -164,6 +175,27 @@ public class GameController {
         alert.setHeaderText("Game Over");
         alert.setContentText("You Win!");
         alert.showAndWait();
+    }
+
+    private void exportData() throws Exception{
+        var objectMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+        var data = new Data();
+        if (model.getPlayerTurn() % 2 == 0){
+            data.setWinner(bluePlayerName);
+            data.setLooser(redPlayerName);
+        }
+        else {
+            data.setWinner(redPlayerName);
+            data.setLooser(bluePlayerName);
+        }
+        data.setDate(String.valueOf(LocalDate.now()));
+
+        System.out.println(objectMapper.writeValueAsString(data));
+
+        try(var writer = new FileWriter("data.json")){
+            objectMapper.writeValue(writer, data);
+        }
+        System.out.println(objectMapper.readValue(new FileReader("data.json"), Data.class));
     }
 
     private void showWinningCells(){

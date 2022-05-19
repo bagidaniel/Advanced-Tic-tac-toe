@@ -163,7 +163,6 @@ public class GameModel {
     }
 
     protected boolean diagWins(List<Position> positions){
-        System.out.println(positions);
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
                 if (positions.get(i).row()-1 == positions.get(j).row() && positions.get(i).col()-1 == positions.get(j).col()) {
