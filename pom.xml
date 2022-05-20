@@ -6,7 +6,7 @@
     <groupId>hu.unideb.inf</groupId>
     <artifactId>homework-project-bagidaniel</artifactId>
     <version>1.0</version>
-    <description><!-- TODO: a short description of your project --></description>
+    <description>Players take turns to move a circle of their own color to a four-adjacent empty field. The winner is the player who manages to place 3 discs of his own color next to each other vertically, horizontally or diagonally.</description>
     <developers>
         <developer>
             <id>NGOW65</id>
