@@ -2,7 +2,6 @@ package game.gui;
 
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +11,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
@@ -60,7 +58,7 @@ public class GameController {
     private Label label;
 
     @FXML
-    public void handleResetButton(ActionEvent event) throws IOException {
+    public void handleResetButton(){
         resetGame();
     }
 
