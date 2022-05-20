@@ -9,15 +9,11 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import game.model.Data;
+
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
@@ -26,10 +22,12 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
+import org.tinylog.Logger;
+
 import game.model.Direction;
 import game.model.Position;
 import game.model.GameModel;
-import javafx.stage.Stage;
+import game.model.Data;
 
 public class GameController {
 
@@ -68,6 +66,7 @@ public class GameController {
 
     @FXML
     private void initialize() {
+        Logger.info("Starting the game...");
         createBoard();
         createCircles();
         setSelectablePositions();
@@ -85,6 +84,7 @@ public class GameController {
         createCircles();
         setSelectablePositions();
         showSelectableCells();
+        Logger.info("Restarting the game...");
     }
 
     private void createBoard() {
@@ -130,6 +130,7 @@ public class GameController {
         var row = GridPane.getRowIndex(cell);
         var col = GridPane.getColumnIndex(cell);
         var position = new Position(row, col);
+        Logger.debug("Click on cell: " + position);
         if (!isGameOver){
             handleClickOnCell(position);
         }
@@ -146,6 +147,7 @@ public class GameController {
             if (selectablePositions.contains(position)) {
                 var circleID = model.getCircleID(selectedPosition).getAsInt();
                 var direction = Direction.of(position.row() - selectedPosition.row(), position.col() - selectedPosition.col());
+                Logger.debug("Moving piece {} {}", circleID, direction);
                 model.move(circleID, direction);
                 handleNextTurn();
             }
@@ -163,6 +165,7 @@ public class GameController {
             }catch (Exception e){
                 System.out.println("Hiba");
             }
+            Logger.info(getActivePlayer() + " won the game!");
             //showGameOverUI();
         }
         else {
@@ -177,25 +180,30 @@ public class GameController {
         alert.showAndWait();
     }
 
+    private String getActivePlayer(){
+        if (model.getPlayerTurn() % 2 == 0){
+            return bluePlayerName;
+        }
+        return redPlayerName;
+    }
+
+    private String getPassivePlayer(){
+        if (getActivePlayer().equals(bluePlayerName)){
+            return redPlayerName;
+        }
+        return bluePlayerName;
+    }
+
     private void exportData() throws Exception{
         var objectMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
         var data = new Data();
-        if (model.getPlayerTurn() % 2 == 0){
-            data.setWinner(bluePlayerName);
-            data.setLooser(redPlayerName);
-        }
-        else {
-            data.setWinner(redPlayerName);
-            data.setLooser(bluePlayerName);
-        }
+        data.setWinner(getActivePlayer());
+        data.setLooser(getPassivePlayer());
         data.setDate(String.valueOf(LocalDate.now()));
-
-        System.out.println(objectMapper.writeValueAsString(data));
-
         try(var writer = new FileWriter("data.json")){
             objectMapper.writeValue(writer, data);
         }
-        System.out.println(objectMapper.readValue(new FileReader("data.json"), Data.class));
+        Logger.debug(objectMapper.readValue(new FileReader("data.json"), Data.class));
     }
 
     private void showWinningCells(){
@@ -221,19 +229,14 @@ public class GameController {
             label.setText(bluePlayerName + " turns");
             label.setStyle("-fx-background-color: black;" + "-fx-text-fill: blue");
         }
-        else{
+        else {
             label.setText(redPlayerName + " turns");
             label.setStyle("-fx-background-color: black;" + "-fx-text-fill: red");
         }
     }
 
     public void setWinLabel(){
-        if (model.getPlayerTurn() % 2 == 0){
-            label.setText(bluePlayerName + " wins");
-        }
-        else{
-            label.setText(redPlayerName + " wins");
-        }
+        label.setText(getActivePlayer() + " wins");
         label.setStyle("-fx-background-color: black;" + "-fx-text-fill: green");
     }
 
@@ -257,6 +260,7 @@ public class GameController {
             var cell = getCell(selectablePosition);
             cell.getStyleClass().add("selectable");
         }
+        Logger.info("Selectable positions: " + selectablePositions);
     }
 
     private void hideSelectableCells() {
@@ -277,6 +281,7 @@ public class GameController {
     }
 
     private void circlePositionChange(ObservableValue<? extends Position> observable, Position oldPosition, Position newPosition) {
+        Logger.debug("Move: {} -> {}", oldPosition, newPosition);
         StackPane oldCell = getCell(oldPosition);
         StackPane newCell = getCell(newPosition);
         newCell.getChildren().addAll(oldCell.getChildren());
