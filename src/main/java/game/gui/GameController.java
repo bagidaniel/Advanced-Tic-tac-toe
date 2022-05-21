@@ -161,21 +161,13 @@ public class GameController {
             try {
                 exportData();
             }catch (Exception e){
-                System.out.println("Hiba");
+                Logger.debug("Error");
             }
             Logger.info(getActivePlayer() + " won the game!");
-            //showGameOverUI();
         }
         else {
             switchSelectionPhase();
         }
-    }
-
-    private void showGameOverUI(){
-        var alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setHeaderText("Game Over");
-        alert.setContentText("You Win!");
-        alert.showAndWait();
     }
 
     private String getActivePlayer(){

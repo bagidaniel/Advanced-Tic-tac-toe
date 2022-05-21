@@ -303,11 +303,6 @@ public class GameModel {
     }
 
     @Override
-    public int hashCode() {
-        return Arrays.hashCode(circles);
-    }
-
-    @Override
     public String toString() {
         StringJoiner joiner = new StringJoiner(",", "[", "]");
         for (var circle : circles) {
